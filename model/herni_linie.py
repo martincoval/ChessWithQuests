@@ -45,14 +45,14 @@ class HerniPlocha:
 
         for i in range(8):
             self.herni_deska[6][i] = Pesec(barva=0)
-            self.herni_deska[7][0] = Vez(barva=0)
-            self.herni_deska[7][1] = Jezdec(barva=0)
-            self.herni_deska[7][2] = Strelec(barva=0)
-            self.herni_deska[7][3] = Dama(barva=0)
-            self.herni_deska[7][4] = Kral(barva=0)
-            self.herni_deska[7][5] = Strelec(barva=0)
-            self.herni_deska[7][6] = Jezdec(barva=0)
-            self.herni_deska[7][7] = Vez(barva=0)
+        self.herni_deska[7][0] = Vez(barva=0)
+        self.herni_deska[7][1] = Jezdec(barva=0)
+        self.herni_deska[7][2] = Strelec(barva=0)
+        self.herni_deska[7][3] = Dama(barva=0)
+        self.herni_deska[7][4] = Kral(barva=0)
+        self.herni_deska[7][5] = Strelec(barva=0)
+        self.herni_deska[7][6] = Jezdec(barva=0)
+        self.herni_deska[7][7] = Vez(barva=0)
 
         self._aktualizuj_obsazene_pozice()
 
