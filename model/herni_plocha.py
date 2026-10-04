@@ -33,6 +33,25 @@ class HerniPlocha:
             r_str = " ".join([str(fig) if fig else "." for fig in radek])
             print(f"{cislo_radku} {r_str}")
 
+    def posun_figurky(self, tah) -> bool:
+        r_start, s_start = tah.vychozi_pozice
+        r_cil, s_cil = tah.cilova_pozice
+
+        figurka = self.herni_deska[r_start][s_start]
+        if not(figurka):
+            return False
+
+        target = self.herni_deska[r_cil][s_cil]
+        if target:
+            if target.barva == 1:
+                self.vyhozene_figurky_b.append(target)
+            else:
+                self.vyhozene_figurky_c.append(target)
+
+        self.herni_deska[r_cil][s_cil] = figurka
+        self.herni_deska[r_start][s_start] = None
+        return True
+
 if __name__ == "__main__":
     plocha = HerniPlocha()
     plocha.vykresli()
