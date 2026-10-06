@@ -27,11 +27,14 @@ class HerniPlocha:
             Vez(-1), Jezdec(-1), Strelec(-1), Dama(-1), Kral(-1), Strelec(-1), Jezdec(-1), Vez(-1),]
 
     def vykresli(self):
-        print("  0 1 2 3 4 5 6 7")
+        print("\n  a b c d e f g h")
+        print("  ----------------")
         for idx, radek in enumerate(reversed(self.herni_deska)):
-            cislo_radku = 7 - idx
+            cislo_radku = 8 - idx  # Zobrazení řádků 8 až 1
             r_str = " ".join([str(fig) if fig else "." for fig in radek])
-            print(f"{cislo_radku} {r_str}")
+            print(f"{cislo_radku}|{r_str}|{cislo_radku}")
+        print("  ----------------")
+        print("  a b c d e f g h\n")
 
     def posun_figurky(self, tah) -> bool:
         r_start, s_start = tah.vychozi_pozice
