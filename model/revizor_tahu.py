@@ -39,6 +39,34 @@ class RevizorTahu:
 
                     return mozne_pozice
 
+        if figurka.nazev == "Král":
+            for dr, ds in figurka.vektory:
+                nr, ns = radek + dr, sloupec + ds
+                if 0 <= nr < 8 and 0 <= ns < 8:
+                    obsah = self.herni_plocha.vrat_obsah((nr,ns))
+                    if obsah is None or obsah.barva !=figurka.barva:
+                        mozne_pozice.append((nr,ns))
+
+            if not getattr(figurka, "pohnul_se", False) and sloupec == 4:
+                vez_m = self.herni_plocha.vrat_obsah((radek, 7))
+                if vez_m and vez_m.nazev == "Věž" and not getattr(figurka, "pohnul_se", False):
+                    if (
+                        self.herni_plocha.vrat_obsah((radek, 5)) is None
+                        and self.herni_plocha.vrat_obsah((radek, 6)) is None
+                    ):
+                        mozne_pozice.append((radek, 6))
+
+                vez_v = self.herni_plocha.vrat_obsah((radek, 0))
+                if vez_v and vez_v.nazev == "Věž" and not getattr(figurka, "pohnul_se", False):
+                    if (
+                        self.herni_plocha.vrat_obsah((radek, 1)) is None
+                        and self.herni_plocha.vrat_obsah((radek, 2)) is None
+                        and self.herni_plocha.vrat_obsah((radek, 3)) is None
+                    ):
+                        mozne_pozice.append((radek, 2))
+
+            return mozne_pozice
+
         if figurka.skok_figury:
             for dr, ds in figurka.vektory:
                 nr, ns = radek + dr, sloupec + ds

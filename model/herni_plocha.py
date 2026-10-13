@@ -41,15 +41,17 @@ class HerniPlocha:
         r_cil, s_cil = tah.cilova_pozice
 
         figurka = self.herni_deska[r_start][s_start]
-        if not(figurka):
+        if not figurka :
             return False
 
         target = self.herni_deska[r_cil][s_cil]
         if target:
-            if target.barva == 1:
+            if target.barva == -1:
                 self.vyhozene_figurky_b.append(target)
             else:
                 self.vyhozene_figurky_c.append(target)
+
+        figurka.pohnula_se = True
 
         self.herni_deska[r_cil][s_cil] = figurka
         self.herni_deska[r_start][s_start] = None

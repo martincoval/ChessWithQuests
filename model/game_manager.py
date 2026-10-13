@@ -8,7 +8,7 @@ class GameManager:
     def __init__(self):
         self.herni_plocha = HerniPlocha()
         self.revizor = RevizorTahu(self.herni_plocha)
-        self.aktivni_hrac = -1
+        self.aktivni_hrac = 1
         self.cil_en_passant: tuple[int, int] | None = (None)
 
     def zkontroluj_promoci_pesce(self, r_cil: int, s_cil: int, figurka) -> None:
@@ -57,6 +57,21 @@ class GameManager:
         uspech = self.herni_plocha.posun_figurky(tah)
 
         if uspech:
+            if figurka.nazev == "Král" and abs(s_cil -s_start) == 2:
+                if s_cil == 6:
+                    vez = self.herni_plocha.vrat_obsah((r_start, 7))
+                    self.herni_plocha.herni_deska[r_start][5] = vez
+                    self.herni_plocha.herni_deska[r_start][7] = None
+                    if vez:
+                        vez.pohnula_se = True
+
+                elif s_cil == 2:
+                    vez = self.herni_plocha.vrat_obsah((r_start, 0))
+                    self.herni_plocha.herni_deska[r_start][3] = vez
+                    self.herni_plocha.herni_deska[r_start][0] = None
+                    if vez:
+                        vez.pohnula_se = True
+
             if je_en_passant:
                 vyhozeny_pesec = self.herni_plocha.vrat_obsah((r_start, s_cil))
                 if vyhozeny_pesec:
@@ -88,7 +103,7 @@ if __name__ == "__main__":
         print("ŠACHOVNICE")
         gm.herni_plocha.vykresli()
 
-        hrac_str = "bílý" if gm.aktivni_hrac == -1 else "černý"
+        hrac_str = "bílý" if gm.aktivni_hrac == 1 else "černý"
         print(f"\nNa tahu je: {hrac_str}")
 
         odkud = input("Zadej pole ODKUD (nebo 'konec'): ").strip().lower()

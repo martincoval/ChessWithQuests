@@ -9,6 +9,7 @@ class Figurka(ABC):
         self.vektory_utoku:list[Vektor] = []
         self.barva:int = barva
         self.skok_figury: bool = skok_figury
+        self.pohnula_se:bool = False
 
     def __repr__(self):
         pismeno = self.nazev[0]
