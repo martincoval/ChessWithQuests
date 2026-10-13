@@ -95,3 +95,35 @@ class RevizorTahu:
                         break
                     krok += 1
         return mozne_pozice
+
+    def najdi_krale(self, barva:int) -> tuple[int, int] | None:
+        for r in range(8):
+            for s in range(8):
+                fig = self.herni_plocha.vrat_obsah((r,s))
+                if fig and fig.nazev == "Král" and fig.barva == barva:
+                    return (r, s)
+                return None
+
+    def je_kral_v_sachu(self, barva:int) -> bool:
+        pozice_krale = self.najdi_krale(barva)
+        if not pozice_krale:
+            return False
+
+        souper_barva = -barva
+
+        for r in range(8):
+            for s in range(8):
+                fig = self.herni_plocha.vrat_obsah((r,s))
+                if fig and fig.barva == souper_barva:
+                    if fig.nazev == "Pěšec":
+                        tahy_soupere = []
+                        for dr, ds in fig.vektory_utoku:
+                            ur, us = r + dr, s + ds
+                            if 0 <= ur < 8 and 0 <= us < 8:
+                                tahy_soupere.append((ur, us))
+                    else:
+                        tahy_soupere = self.ziskat_mozne_tahy(r, s)
+
+                    if pozice_krale in tahy_soupere:
+                        return True
+        return False

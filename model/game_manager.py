@@ -47,6 +47,20 @@ class GameManager:
             print(f"Tento tah není pro {figurka.nazev} povolen!")
             return False
 
+        puvodni_terc = self.herni_plocha.vrat_obsah((r_cil, s_cil))
+
+        self.herni_plocha.nastav_obsah((r_cil, s_cil), figurka)
+        self.herni_plocha.nastav_obsah((r_start, s_start), None)
+
+        vlastni_kral_v_sachu = self.revizor.je_kral_v_sachu(self.aktivni_hrac)
+
+        self.herni_plocha.nastav_obsah((r_start, s_start), figurka)
+        self.herni_plocha.nastav_obsah((r_cil, s_cil), puvodni_terc)
+
+        if vlastni_kral_v_sachu:
+            print("Tento tah nemůžeš hrát, tvůj král by byl v šachu.")
+            return False
+
         je_en_passant = (
             figurka.nazev == "Pěšec"
             and (r_cil, s_cil) == self.cil_en_passant
@@ -57,18 +71,18 @@ class GameManager:
         uspech = self.herni_plocha.posun_figurky(tah)
 
         if uspech:
-            if figurka.nazev == "Král" and abs(s_cil -s_start) == 2:
+            if figurka.nazev == "Král" and abs(s_cil - s_start) == 2:
                 if s_cil == 6:
                     vez = self.herni_plocha.vrat_obsah((r_start, 7))
-                    self.herni_plocha.herni_deska[r_start][5] = vez
-                    self.herni_plocha.herni_deska[r_start][7] = None
+                    self.herni_plocha.nastav_obsah((r_start, 5), vez)
+                    self.herni_plocha.nastav_obsah((r_start, 7), None)
                     if vez:
                         vez.pohnula_se = True
 
                 elif s_cil == 2:
                     vez = self.herni_plocha.vrat_obsah((r_start, 0))
-                    self.herni_plocha.herni_deska[r_start][3] = vez
-                    self.herni_plocha.herni_deska[r_start][0] = None
+                    self.herni_plocha.nastav_obsah((r_start, 3), vez)
+                    self.herni_plocha.nastav_obsah((r_start, 0), None)
                     if vez:
                         vez.pohnula_se = True
 
@@ -92,6 +106,11 @@ class GameManager:
                 self.cil_en_passant = None
 
             self.zkontroluj_promoci_pesce(r_cil, s_cil, figurka)
+
+            souper_barva = -self.aktivni_hrac
+            if self.revizor.je_kral_v_sachu(souper_barva):
+                print("ŠACH")
+
             self.aktivni_hrac *= -1
             return True
         return False
