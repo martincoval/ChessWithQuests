@@ -55,6 +55,11 @@ class HerniPlocha:
         self.herni_deska[r_start][s_start] = None
         return True
 
+    def nastav_obsah(self, souradnice: tuple[int, int], figurka: Figurka | None) -> None:
+        r, s = souradnice
+        if 0 <= r < 8 and 0 <= s < 8:
+            self.herni_deska[r][s] = figurka
+
 if __name__ == "__main__":
     plocha = HerniPlocha()
     plocha.vykresli()
