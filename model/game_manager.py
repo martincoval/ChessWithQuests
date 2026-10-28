@@ -9,7 +9,8 @@ class GameManager:
         self.herni_plocha = HerniPlocha()
         self.revizor = RevizorTahu(self.herni_plocha)
         self.aktivni_hrac = 1
-        self.cil_en_passant: tuple[int, int] | None = (None)
+        self.cil_en_passant: tuple[int, int] | None = None
+        self.konec_hry = False
 
     def zkontroluj_promoci_pesce(self, r_cil: int, s_cil: int, figurka) -> None:
         cilova_rada = 7 if figurka.barva == 1 else 0
@@ -28,6 +29,28 @@ class GameManager:
 
             self.herni_plocha.nastav_obsah((r_cil, s_cil), nova_fig)
             print(f"Pěšec proměněn na {nova_fig.nazev}!")
+
+    def ma_hrac_platne_tahy(self, barva: int) -> bool:
+        for r in range(8):
+            for s in range(8):
+                fig = self.herni_plocha.vrat_obsah((r, s))
+                if fig and fig.barva == barva:
+                    mozne = self.revizor.ziskat_mozne_tahy(r, s, self.cil_en_passant)
+                    for r_cil, s_cil in mozne:
+                        # Simulace tahu
+                        puvodni_terc = self.herni_plocha.vrat_obsah((r_cil, s_cil))
+                        self.herni_plocha.nastav_obsah((r_cil, s_cil), fig)
+                        self.herni_plocha.nastav_obsah((r, s), None)
+
+                        vlastni_kral_v_sachu = self.revizor.je_kral_v_sachu(barva)
+
+                        # Vracení do původního stavu
+                        self.herni_plocha.nastav_obsah((r, s), fig)
+                        self.herni_plocha.nastav_obsah((r_cil, s_cil), puvodni_terc)
+
+                        if not vlastni_kral_v_sachu:
+                            return True
+        return False
 
     def zahraj_tah_notaci(self, odkud_str: str, kam_str: str) -> bool:
         r_start, s_start = notace_do_souradnic(odkud_str)
@@ -67,7 +90,7 @@ class GameManager:
             and s_start != s_cil
         )
 
-        tah = Tah((r_start, s_start),(r_cil,s_cil), figurka)
+        tah = Tah((r_start, s_start), (r_cil, s_cil), figurka)
         uspech = self.herni_plocha.posun_figurky(tah)
 
         if uspech:
@@ -90,14 +113,10 @@ class GameManager:
                 vyhozeny_pesec = self.herni_plocha.vrat_obsah((r_start, s_cil))
                 if vyhozeny_pesec:
                     if vyhozeny_pesec.barva == -1:
-                        self.herni_plocha.vyhozene_figurky_b.append(
-                            vyhozeny_pesec
-                        )
+                        self.herni_plocha.vyhozene_figurky_b.append(vyhozeny_pesec)
                     else:
-                        self.herni_plocha.vyhozene_figurky_c.append(
-                            vyhozeny_pesec
-                        )
-                    self.herni_plocha.herni_deska[r_start][s_cil] = None
+                        self.herni_plocha.vyhozene_figurky_c.append(vyhozeny_pesec)
+                    self.herni_plocha.nastav_obsah((r_start, s_cil), None)
 
             if figurka.nazev == "Pěšec" and abs(r_cil - r_start) == 2:
                 stredovy_radek = (r_start + r_cil) // 2
@@ -108,8 +127,23 @@ class GameManager:
             self.zkontroluj_promoci_pesce(r_cil, s_cil, figurka)
 
             souper_barva = -self.aktivni_hrac
+
+            if not self.ma_hrac_platne_tahy(souper_barva):
+                self.herni_plocha.vykresli()
+                if self.revizor.je_kral_v_sachu(souper_barva):
+                    vyherce = "bílý" if self.aktivni_hrac == 1 else "černý"
+                    print("\n" + "=" * 35)
+                    print(f"   *** ŠACH MAT! Vítězí {vyherce}! ***")
+                    print("=" * 35)
+                else:
+                    print("\n" + "=" * 35)
+                    print("   *** PAT! Hra končí remízou. ***")
+                    print("=" * 35)
+                self.konec_hry = True
+                return True
+
             if self.revizor.je_kral_v_sachu(souper_barva):
-                print("ŠACH")
+                print("\n*** ŠACH! ***")
 
             self.aktivni_hrac *= -1
             return True
@@ -118,7 +152,7 @@ class GameManager:
 if __name__ == "__main__":
     gm = GameManager()
 
-    while True:
+    while not gm.konec_hry:
         print("ŠACHOVNICE")
         gm.herni_plocha.vykresli()
 
@@ -134,6 +168,3 @@ if __name__ == "__main__":
         uspech = gm.zahraj_tah_notaci(odkud, kam)
         if not uspech:
             print("Tah se nepodařilo provést, zkus to znovu.")
-
-
-
